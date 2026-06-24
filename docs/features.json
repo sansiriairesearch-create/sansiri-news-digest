@@ -1,7 +1,7 @@
 {
   "project": "Sansiri Daily News Digest (Claude Code)",
   "description": "Headless Claude Code system that turns the daily iQNewsClip email into a curated 5+5 Gmail draft for the Sansiri PR team. Documentation-linked task tracker.",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "lastUpdated": "2026-06-24",
   "relatedDocs": {
     "prd": "./PRD.md",
@@ -343,7 +343,7 @@
       "id": "T-701",
       "title": "C-08 ยืนยัน Gmail MCP ใช้ได้ใน headless cloud (R-01)",
       "phase": "P7",
-      "status": "blocked",
+      "status": "in-progress",
       "description": "ทดสอบว่า Gmail MCP authenticate และเรียก search/get/create_draft ได้จริงในการรันแบบ scheduled/headless — บล็อกเกอร์หลักก่อน go-live",
       "prdRefs": [
         "NFR-01",
@@ -359,13 +359,14 @@
       "acceptanceCriteria": [
         "scheduled run แบบไม่มีคนสั่ง เรียก Gmail MCP สำเร็จ",
         "ถ้าใช้ไม่ได้ มีแผนสำรอง (เช่น service account / API) ระบุไว้"
-      ]
+      ],
+      "notes": "Gmail connector attached to the routine (eases R-01). Verification run triggered manually; confirm via the routine result / Gmail drafts. Open risk R-08: cloud must be able to clone the PRIVATE repo."
     },
     {
       "id": "T-702",
       "title": "C-08 ลงทะเบียน schedule (cron 08:00 Asia/Bangkok)",
       "phase": "P7",
-      "status": "blocked",
+      "status": "done",
       "description": "ตั้ง scheduled cloud agent ผ่าน /schedule ให้รัน pipeline ทุกเช้า พร้อม grace window เผื่ออีเมลมาช้า",
       "prdRefs": [
         "FR-14",
@@ -382,7 +383,7 @@
         "routine รันตาม cron 08:00 Asia/Bangkok",
         "มี grace/retry ก่อนแจ้งล้มเหลว"
       ],
-      "notes": "Cloud routine needs the code in a GitHub repo (cloud agent clones git; cannot read local files). Project is local-only, no remote, no gh CLI. BLOCKED on: push to a (private) GitHub repo. Cron 08:30 Asia/Bangkok = 30 1 * * * UTC. Gmail connector is available to attach (eases R-01). See Techspec R-07."
+      "notes": "Scheduled cloud routine created: trig_01TRQGeEb3dXRXahsFtVLAKN, cron 30 1 * * * UTC = 08:30 Asia/Bangkok, repo sansiriairesearch-create/sansiri-news-digest (private), Gmail connector attached, model sonnet-4-6, draft-only."
     },
     {
       "id": "T-801",

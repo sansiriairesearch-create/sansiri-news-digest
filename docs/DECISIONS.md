@@ -29,6 +29,21 @@
 | **DD-4** | greenfield Claude Code แยกจาก GAS | ล็อก |
 | **DD-5** | **Header banner = APPROVED & LOCKED** (uxui UX-01/02) ห้ามแก้ layout/สี/ข้อความหัวโดยไม่ขออนุมัติ | ล็อก |
 
+## D. Deployment (production)
+
+| รายการ | ค่า |
+|---|---|
+| GitHub repo (private) | `sansiriairesearch-create/sansiri-news-digest` |
+| Scheduled cloud routine | id `trig_01TRQGeEb3dXRXahsFtVLAKN` · https://claude.ai/code/routines/trig_01TRQGeEb3dXRXahsFtVLAKN |
+| ตารางเวลา | `30 1 * * *` UTC = **08:30 Asia/Bangkok ทุกวัน** |
+| Model | claude-sonnet-4-6 (ปรับเป็น opus ได้ถ้าต้องการคุณภาพสรุปสูงขึ้น) |
+| MCP | Gmail connector แนบกับ routine แล้ว |
+| โหมด | draft-only (ไม่ส่ง) · idempotent · failure-report |
+
+> 🔒 **Token cleanup:** Personal Access Token ที่ใช้ push ครั้งแรก **ควรลบทิ้ง** ที่ https://github.com/settings/tokens
+> (git remote เก็บแบบไม่มี token แล้ว). repo เป็น **private** เรียบร้อย
+> ⚠️ **ต้องยืนยัน (R-08):** cloud routine ต้อง clone repo **private** ได้ — ถ้า run แรกล้มเหลวเรื่อง clone ให้เชื่อม GitHub กับ Anthropic cloud environment (หรือทำ repo ให้ cloud เข้าถึงได้)
+
 ## C. มาตรฐานการทำงาน (กันพลาดก่อนสร้าง draft ทุกครั้ง)
 
 1. รัน `python3 scripts/smoke_test.py` ให้ผ่านก่อน (parse→cluster→build→validate บน fixtures)

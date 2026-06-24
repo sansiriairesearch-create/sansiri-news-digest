@@ -35,7 +35,7 @@
 |---|---|
 | GitHub repo (private) | `sansiriairesearch-create/sansiri-news-digest` |
 | Scheduled cloud routine | id `trig_01TRQGeEb3dXRXahsFtVLAKN` · https://claude.ai/code/routines/trig_01TRQGeEb3dXRXahsFtVLAKN |
-| ตารางเวลา | `30 1 * * *` UTC = **08:30 Asia/Bangkok ทุกวัน** |
+| ตารางเวลา | `5 1 * * *` UTC = **08:05 Asia/Bangkok ทุกวัน** (อีเมล iQNewsClip มา ~07:58 น. → margin ~7 นาที; มี retry/grace + idempotency กันพลาด) |
 | Model | claude-sonnet-4-6 (ปรับเป็น opus ได้ถ้าต้องการคุณภาพสรุปสูงขึ้น) |
 | MCP | Gmail connector แนบกับ routine แล้ว |
 | โหมด | draft-only (ไม่ส่ง) · idempotent · failure-report |

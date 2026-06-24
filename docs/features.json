@@ -383,7 +383,7 @@
         "routine รันตาม cron 08:00 Asia/Bangkok",
         "มี grace/retry ก่อนแจ้งล้มเหลว"
       ],
-      "notes": "Scheduled cloud routine created: trig_01TRQGeEb3dXRXahsFtVLAKN, cron 30 1 * * * UTC = 08:30 Asia/Bangkok, repo sansiriairesearch-create/sansiri-news-digest (private), Gmail connector attached, model sonnet-4-6, draft-only."
+      "notes": "Scheduled cloud routine created: trig_01TRQGeEb3dXRXahsFtVLAKN, cron 5 1 * * * UTC = 08:05 Asia/Bangkok, repo sansiriairesearch-create/sansiri-news-digest (private), Gmail connector attached, model sonnet-4-6, draft-only."
     },
     {
       "id": "T-801",

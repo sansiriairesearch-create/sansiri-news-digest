@@ -1,0 +1,52 @@
+{
+  "date_th": "24 มิถุนายน 2569",
+  "date_en": "June 24, 2026",
+  "sansiri": [
+    {
+      "cluster_id": "s1",
+      "company": "Sansiri",
+      "title": "แสนสิริเดินหน้าโอน 3 โครงการตระกูล Via ยอดขายทะลุ 70%",
+      "summary": "แสนสิริเดินหน้าตามแผนทยอยโอนกรรมสิทธิ์โครงการคอนโดมิเนียมตระกูล Via จำนวน 3 โครงการภายในปีนี้ ล่าสุดเผยโฉม Via 61 ซึ่งมียอดขายแล้วกว่า 70% ของโครงการ\n\nสะท้อนความต้องการที่อยู่อาศัยระดับลักชัวรีในทำเลศักยภาพที่ยังแข็งแกร่ง",
+      "urls": {
+        "prints": [],
+        "online": [{"media_title": "iurban.in.th", "headline_url": "https://re.dataxet.co/api/https:/www.iurban.in.th/pr/via61/", "pr_value": 75462.0, "media_type": "online"}],
+        "social": []
+      }
+    },
+    {
+      "cluster_id": "s2",
+      "company": "Sansiri",
+      "title": "“แสนสิริ” ติดอันดับ Fortune Southeast Asia 500 ต่อเนื่องปีที่ 3",
+      "summary": "บริษัท แสนสิริ จำกัด (มหาชน) ติดอันดับ Fortune Southeast Asia 500 ต่อเนื่องเป็นปีที่ 3 ตอกย้ำสถานะผู้นำในวงการอสังหาริมทรัพย์ไทย\n\nข่าวได้รับการเผยแพร่ในวงกว้างทั้งสื่อออนไลน์ชั้นนำและสื่อสังคมออนไลน์",
+      "urls": {
+        "prints": [],
+        "online": [{"media_title": "prachachat.net", "headline_url": "https://re.dataxet.co/api/https:/www.prachachat.net/real-estate/news-2026308", "pr_value": 276219.0, "media_type": "online"}],
+        "social": []
+      }
+    }
+  ],
+  "competitor": [
+    {
+      "cluster_id": "c1",
+      "company": "Pruksa",
+      "title": "พฤกษา จับมือ TOA ยกระดับ Green Ecosystem ผ่านนวัตกรรมสีฉลาก EPD",
+      "summary": "พฤกษา เรียลเอสเตท ประกาศความร่วมมือกับ TOA ยกระดับ Green Ecosystem ผ่านนวัตกรรมสีที่มีฉลาก EPD ภายใต้แนวคิด Lifetime Well-Living",
+      "urls": {
+        "prints": [],
+        "online": [{"media_title": "mgronline.com", "headline_url": "https://re.dataxet.co/api/https:/mgronline.com/stockmarket/detail/9690000059985", "pr_value": 330294.0, "media_type": "online"}],
+        "social": []
+      }
+    },
+    {
+      "cluster_id": "c2",
+      "company": "Supalai",
+      "title": "ศุภาลัย เตรียมปั้น Supalai Euro Village หัวหิน สู่แลนด์มาร์กท่องเที่ยวสากล",
+      "summary": "ศุภาลัย เตรียมพัฒนาโครงการ Supalai Euro Village Hua Hin ใจกลางหัวหิน พร้อมยกระดับสู่การเป็นแลนด์มาร์กด้านการท่องเที่ยวระดับสากล",
+      "urls": {
+        "prints": [],
+        "online": [{"media_title": "livinginsider.com", "headline_url": "https://re.dataxet.co/api/https:/www.livinginsider.com/news/14615/supalai", "pr_value": 261207.0, "media_type": "online"}],
+        "social": []
+      }
+    }
+  ]
+}

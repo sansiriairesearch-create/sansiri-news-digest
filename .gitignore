@@ -1,0 +1,22 @@
+# Generated artifacts / scratch (not source)
+work/
+*.tmp
+attach_b64.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# Local Claude config (session-specific; not part of the product)
+.claude/settings.json
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+**/.DS_Store
+
+# Secrets (never commit)
+.env
+*.secret
+*credentials*
+*token*

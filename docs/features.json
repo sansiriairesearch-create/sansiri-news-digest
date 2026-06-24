@@ -1,0 +1,468 @@
+{
+  "project": "Sansiri Daily News Digest (Claude Code)",
+  "description": "Headless Claude Code system that turns the daily iQNewsClip email into a curated 5+5 Gmail draft for the Sansiri PR team. Documentation-linked task tracker.",
+  "version": "0.3.0",
+  "lastUpdated": "2026-06-24",
+  "relatedDocs": {
+    "prd": "./PRD.md",
+    "techspec": "./Techspec.md",
+    "uxui": "./uxui.md",
+    "decisions": "./DECISIONS.md"
+  },
+  "statusLegend": {
+    "todo": "ยังไม่เริ่ม",
+    "in-progress": "กำลังทำ",
+    "blocked": "ติดบล็อกเกอร์ รอแก้",
+    "done": "เสร็จและตรวจแล้ว"
+  },
+  "phases": [
+    {
+      "id": "P0",
+      "name": "Scaffolding",
+      "goal": "ตั้งโครงโปรเจกต์ + สกิล + fixtures"
+    },
+    {
+      "id": "P1",
+      "name": "Ingest + Parse",
+      "goal": "ดึงอีเมล iQNewsClip และแตกเป็น NewsItem"
+    },
+    {
+      "id": "P2",
+      "name": "Cluster + Select",
+      "goal": "จัดกลุ่ม จัดอันดับ เลือก 5+5 + URLs"
+    },
+    {
+      "id": "P3",
+      "name": "AI Summarize + QG",
+      "goal": "เขียนพาดหัว/สรุป + Content Quality Gate"
+    },
+    {
+      "id": "P4",
+      "name": "HTML Build",
+      "goal": "เรนเดอร์อีเมล HTML แบรนด์แสนสิริ"
+    },
+    {
+      "id": "P5",
+      "name": "Validation",
+      "goal": "ชุดตรวจ 14 ข้อ deterministic"
+    },
+    {
+      "id": "P6",
+      "name": "Draft Creation",
+      "goal": "สร้าง Gmail draft + idempotency"
+    },
+    {
+      "id": "P7",
+      "name": "Scheduling / Cloud",
+      "goal": "รันอัตโนมัติ headless ทุกเช้า"
+    },
+    {
+      "id": "P8",
+      "name": "Failure Handling",
+      "goal": "แจ้งเตือนเมื่อ pipeline ล้ม"
+    },
+    {
+      "id": "P9",
+      "name": "Hardening / Tests",
+      "goal": "smoke test, dry-run, ตรวจ parity"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "Scaffold โปรเจกต์ NewsSummary + โครงสกิล",
+      "phase": "P0",
+      "status": "done",
+      "description": "สร้างโครงไดเรกทอรี .claude/skills/sansiri-daily-news-digest/ (scripts/, references/, fixtures/) ตาม Techspec §3",
+      "prdRefs": [
+        "NFR-07"
+      ],
+      "techspecRefs": [
+        "C-08"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [],
+      "acceptanceCriteria": [
+        "โครงโฟลเดอร์ครบตาม Techspec §3",
+        "มี SKILL.md ว่างพร้อม frontmatter (name, description)"
+      ]
+    },
+    {
+      "id": "T-002",
+      "title": "เขียน references: company_keywords + top_media",
+      "phase": "P0",
+      "status": "done",
+      "description": "ย่อรายการกลุ่มแสนสิริ + 15 คู่แข่ง + คีย์เวิร์ด 7 หมวด + Top Media ranked ลงไฟล์ references",
+      "prdRefs": [
+        "BR-07"
+      ],
+      "techspecRefs": [
+        "C-03",
+        "C-04"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-001"
+      ],
+      "acceptanceCriteria": [
+        "company_keywords.md ครอบคลุมกลุ่มแสนสิริ + 15 คู่แข่ง",
+        "top_media_list.md จัดอันดับสื่อหลัก"
+      ]
+    },
+    {
+      "id": "T-101",
+      "title": "C-01 Gmail Ingest — ดึงอีเมล iQNewsClip",
+      "phase": "P1",
+      "status": "done",
+      "description": "ใช้ Gmail MCP search_threads + get_thread ดึงอีเมลวันนี้+เมื่อวาน รองรับ tool-results auto-save",
+      "prdRefs": [
+        "FR-01",
+        "NFR-01"
+      ],
+      "techspecRefs": [
+        "C-01"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-001"
+      ],
+      "acceptanceCriteria": [
+        "ค้นอีเมลด้วย subject/sender ได้ถูกต้อง",
+        "อ่าน response ใหญ่จากไฟล์ tool-results ได้โดยไม่ทำ context ล้น"
+      ]
+    },
+    {
+      "id": "T-102",
+      "title": "C-02 Parser — fetch_iqnewsclip.py",
+      "phase": "P1",
+      "status": "done",
+      "description": "แตกตาราง 7 คอลัมน์เป็น NewsItem, dedupe ข้ามอีเมล, กรองช่วงเวลา D-1 12:00 → run (Asia/Bangkok)",
+      "prdRefs": [
+        "FR-02",
+        "FR-03",
+        "FR-04",
+        "NFR-02"
+      ],
+      "techspecRefs": [
+        "C-02"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-101"
+      ],
+      "acceptanceCriteria": [
+        "รองรับทั้ง HTML table และ plaintext body",
+        "exit codes: 0 ok / 1 no input / 2 parse error / 3 ไม่มีข่าวในช่วงเวลา",
+        "ผลลัพธ์เป็น iqnewsclip_parsed.json แยก sansiri/competitor"
+      ]
+    },
+    {
+      "id": "T-201",
+      "title": "C-03 Cluster — จัดกลุ่มตามธีม + จัดอันดับ",
+      "phase": "P2",
+      "status": "done",
+      "description": "cluster_and_select.py จัดกลุ่มข่าวตามธีม จัดอันดับด้วย PR Value รวม + โบนัส Top Media",
+      "prdRefs": [
+        "FR-05",
+        "FR-06"
+      ],
+      "techspecRefs": [
+        "C-03"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-102",
+        "T-002"
+      ],
+      "acceptanceCriteria": [
+        "จัดกลุ่มข่าวซ้ำธีมเข้าด้วยกัน",
+        "อันดับสะท้อน PR Value + โบนัส Top Media"
+      ]
+    },
+    {
+      "id": "T-202",
+      "title": "C-03 Select 5+5 + เลือก URL ตัวแทน",
+      "phase": "P2",
+      "status": "done",
+      "description": "เลือกแสนสิริ 5 + คู่แข่ง 5 และเลือก URL เรียง print→online→social (PR Value มาก→น้อย) ออกเป็น digest_suggestion.json",
+      "prdRefs": [
+        "FR-07",
+        "FR-08",
+        "BR-05"
+      ],
+      "techspecRefs": [
+        "C-03"
+      ],
+      "uxuiRefs": [
+        "UX-03"
+      ],
+      "dependencies": [
+        "T-201"
+      ],
+      "acceptanceCriteria": [
+        "ได้ 5+5 cluster (title/summary ว่าง)",
+        "urls แยก prints/online/social เรียงตามกติกา"
+      ]
+    },
+    {
+      "id": "T-301",
+      "title": "C-04 Content Quality Gate",
+      "phase": "P3",
+      "status": "done",
+      "description": "ให้ Claude ตรวจทุกข่าวตามเกณฑ์ตัดออก 5 ข้อ (prompt injection / ข่าวปลอม / off-topic / brand-damaging / URL mismatch)",
+      "prdRefs": [
+        "FR-09",
+        "BR-03"
+      ],
+      "techspecRefs": [
+        "C-04"
+      ],
+      "uxuiRefs": [
+        "UX-05"
+      ],
+      "dependencies": [
+        "T-202"
+      ],
+      "acceptanceCriteria": [
+        "ข่าวที่ไม่ผ่านเกณฑ์ถูกตัด แม้มาจาก Top Media",
+        "บันทึกเหตุผลที่ตัดออก",
+        "ยอมให้จำนวนข่าวน้อยกว่า 10 ได้"
+      ]
+    },
+    {
+      "id": "T-302",
+      "title": "C-04 เขียนพาดหัว + สรุป (digest_config.json)",
+      "phase": "P3",
+      "status": "done",
+      "description": "Claude เขียนพาดหัว 1-2 บรรทัด + สรุป 2-4 ย่อหน้า ภาษาไทยทางการ ตาม BR-04 บันทึกลง digest_config.json",
+      "prdRefs": [
+        "FR-10",
+        "BR-01",
+        "BR-02",
+        "BR-04",
+        "BR-06"
+      ],
+      "techspecRefs": [
+        "C-04"
+      ],
+      "uxuiRefs": [
+        "UX-03"
+      ],
+      "dependencies": [
+        "T-301"
+      ],
+      "acceptanceCriteria": [
+        "ทุก cluster มี title + summary ครบ",
+        "ลำดับข่าวเป็นไปตาม BR-01/BR-02 (รวมข้อยกเว้น crisis/highlight)",
+        "สรุปมีตัวเลข/ชื่อผู้บริหารจากต้นฉบับ ไม่มีความเห็น/อิโมจิ"
+      ]
+    },
+    {
+      "id": "T-401",
+      "title": "C-05 HTML Builder — build_html_digest.py",
+      "phase": "P4",
+      "status": "done",
+      "description": "เรนเดอร์ digest_config.json เป็นอีเมล HTML แบรนด์ (inline CSS, GraphikTH, table layout) ตาม uxui",
+      "prdRefs": [
+        "FR-11",
+        "NFR-05"
+      ],
+      "techspecRefs": [
+        "C-05"
+      ],
+      "uxuiRefs": [
+        "UX-01",
+        "UX-02",
+        "UX-03",
+        "UX-04",
+        "UX-06",
+        "UX-07"
+      ],
+      "dependencies": [
+        "T-302"
+      ],
+      "acceptanceCriteria": [
+        "fail ถ้า config มี placeholder ค้าง",
+        "เอาต์พุต digest_<YYYYMMDD>.html ตรงเทมเพลต UX-07",
+        "วันที่ TH(พ.ศ.)+EN(ค.ศ.) ถูกต้อง"
+      ]
+    },
+    {
+      "id": "T-501",
+      "title": "C-06 Validator — pre_draft_check.py (14 checks)",
+      "phase": "P5",
+      "status": "done",
+      "description": "ตรวจ HTML 14 ข้อ deterministic ต้อง exit 0 ก่อนสร้าง draft",
+      "prdRefs": [
+        "FR-12",
+        "NFR-07"
+      ],
+      "techspecRefs": [
+        "C-06"
+      ],
+      "uxuiRefs": [
+        "UX-08"
+      ],
+      "dependencies": [
+        "T-401"
+      ],
+      "acceptanceCriteria": [
+        "ครบเช็ก C1-C12 ตาม Techspec §7",
+        "exit 0 เมื่อผ่าน / 1 เมื่อไม่ผ่าน พร้อมรายงานรายข้อ"
+      ],
+      "notes": "14 deterministic checks; added C13 (banner bgcolor, regression D-02) and C14 (no baked google.com/url, regression D-03)."
+    },
+    {
+      "id": "T-601",
+      "title": "C-07 Draft Creator + idempotency",
+      "phase": "P6",
+      "status": "done",
+      "description": "สร้าง Gmail draft (ไม่ส่ง) ด้วย create_draft; ถ้ามี draft ของวันนั้นแล้วให้แทนที่ ไม่สร้างซ้ำ",
+      "prdRefs": [
+        "FR-13",
+        "FR-16",
+        "NFR-03"
+      ],
+      "techspecRefs": [
+        "C-07"
+      ],
+      "uxuiRefs": [
+        "UX-04"
+      ],
+      "dependencies": [
+        "T-501"
+      ],
+      "acceptanceCriteria": [
+        "ได้ draft พร้อมผู้รับ 7 ราย + subject + HTML body",
+        "ไม่มีการส่งอัตโนมัติทุกกรณี (Rule 35)",
+        "รันซ้ำในวันเดียวกันไม่เกิด draft ซ้อน"
+      ],
+      "notes": "Draft creation works via create_draft. Idempotency implemented as Step-0 pre-check (daily_meta.py + list_drafts/search_threads); MCP cannot delete/replace drafts so guard = do-not-duplicate. See DECISIONS D-04."
+    },
+    {
+      "id": "T-701",
+      "title": "C-08 ยืนยัน Gmail MCP ใช้ได้ใน headless cloud (R-01)",
+      "phase": "P7",
+      "status": "blocked",
+      "description": "ทดสอบว่า Gmail MCP authenticate และเรียก search/get/create_draft ได้จริงในการรันแบบ scheduled/headless — บล็อกเกอร์หลักก่อน go-live",
+      "prdRefs": [
+        "NFR-01",
+        "FR-14"
+      ],
+      "techspecRefs": [
+        "C-08"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-601"
+      ],
+      "acceptanceCriteria": [
+        "scheduled run แบบไม่มีคนสั่ง เรียก Gmail MCP สำเร็จ",
+        "ถ้าใช้ไม่ได้ มีแผนสำรอง (เช่น service account / API) ระบุไว้"
+      ]
+    },
+    {
+      "id": "T-702",
+      "title": "C-08 ลงทะเบียน schedule (cron 08:00 Asia/Bangkok)",
+      "phase": "P7",
+      "status": "blocked",
+      "description": "ตั้ง scheduled cloud agent ผ่าน /schedule ให้รัน pipeline ทุกเช้า พร้อม grace window เผื่ออีเมลมาช้า",
+      "prdRefs": [
+        "FR-14",
+        "NFR-01"
+      ],
+      "techspecRefs": [
+        "C-08"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-701"
+      ],
+      "acceptanceCriteria": [
+        "routine รันตาม cron 08:00 Asia/Bangkok",
+        "มี grace/retry ก่อนแจ้งล้มเหลว"
+      ],
+      "notes": "Cloud routine needs the code in a GitHub repo (cloud agent clones git; cannot read local files). Project is local-only, no remote, no gh CLI. BLOCKED on: push to a (private) GitHub repo. Cron 08:30 Asia/Bangkok = 30 1 * * * UTC. Gmail connector is available to attach (eases R-01). See Techspec R-07."
+    },
+    {
+      "id": "T-801",
+      "title": "C-09 Failure Reporter — build_failure_report.py",
+      "phase": "P8",
+      "status": "done",
+      "description": "เมื่อขั้นใดล้มเหลว สร้างอีเมลแจ้งสถานะแทน digest เพื่อไม่ให้งานเงียบหาย",
+      "prdRefs": [
+        "FR-15",
+        "NFR-08"
+      ],
+      "techspecRefs": [
+        "C-09"
+      ],
+      "uxuiRefs": [
+        "UX-05"
+      ],
+      "dependencies": [
+        "T-102"
+      ],
+      "acceptanceCriteria": [
+        "ทุกความล้มเหลว (no email / parse / validate) ออก failure report",
+        "ระบุ stage + สาเหตุที่ชัดเจน"
+      ]
+    },
+    {
+      "id": "T-901",
+      "title": "smoke_test.py + diagnose.py + fixtures",
+      "phase": "P9",
+      "status": "done",
+      "description": "health check รัน pipeline บน fixture (sample_parsed.json / sample_config.json) ให้ผ่านก่อน production",
+      "prdRefs": [
+        "NFR-07",
+        "NFR-08"
+      ],
+      "techspecRefs": [
+        "C-02",
+        "C-03",
+        "C-05",
+        "C-06"
+      ],
+      "uxuiRefs": [],
+      "dependencies": [
+        "T-501"
+      ],
+      "acceptanceCriteria": [
+        "smoke_test ครอบ parse→cluster→build→validate",
+        "exit 0 บน fixture"
+      ]
+    },
+    {
+      "id": "T-902",
+      "title": "Dry-run end-to-end + ตรวจ parity",
+      "phase": "P9",
+      "status": "in-progress",
+      "description": "รันจริงหนึ่งวันแล้วเทียบ draft กับ uxui และอีเมลที่เคยทำด้วยมือ เพื่อยืนยันรูปแบบ/แบรนด์/คุณภาพ",
+      "prdRefs": [
+        "SM-01",
+        "SM-02",
+        "SM-04"
+      ],
+      "techspecRefs": [
+        "C-05",
+        "C-06",
+        "C-07"
+      ],
+      "uxuiRefs": [
+        "UX-01",
+        "UX-02",
+        "UX-03"
+      ],
+      "dependencies": [
+        "T-702",
+        "T-901"
+      ],
+      "acceptanceCriteria": [
+        "draft ตรงเทมเพลต uxui และผ่านเช็ก 14 ข้อ",
+        "ทีม PR รีวิวผ่านในการ dry-run"
+      ],
+      "notes": "E2E dry-run executed on the real 24 Jun 2026 iQNewsClip email: 341 records parsed, 5+5 selected, HTML built, all 14 checks pass, test draft created."
+    }
+  ]
+}

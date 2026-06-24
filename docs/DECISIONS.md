@@ -42,7 +42,10 @@
 
 > 🔒 **Token cleanup:** Personal Access Token ที่ใช้ push ครั้งแรก **ควรลบทิ้ง** ที่ https://github.com/settings/tokens
 > (git remote เก็บแบบไม่มี token แล้ว). repo เป็น **private** เรียบร้อย
-> ⚠️ **ต้องยืนยัน (R-08):** cloud routine ต้อง clone repo **private** ได้ — ถ้า run แรกล้มเหลวเรื่อง clone ให้เชื่อม GitHub กับ Anthropic cloud environment (หรือทำ repo ให้ cloud เข้าถึงได้)
+> ⚠️ **R-08 — ยืนยันแล้วว่าติด:** test run คืนค่า `github_repo_access_denied` ("re-authorize GitHub in settings").
+> cloud ยังเข้าถึง repo **private** ไม่ได้. **วิธีแก้:** อนุญาต GitHub ให้ Claude เข้าถึง repo
+> `sansiriairesearch-create/sansiri-news-digest` (ติดตั้ง/อนุญาต Claude GitHub App ผ่าน claude.ai settings หรือหน้า routine)
+> — หรือ (ทางเลือกที่ง่ายกว่าแต่เป็นส่วนตัวน้อยลง) ตั้ง repo เป็น **public**. หลังอนุญาตแล้วให้ re-run เพื่อยืนยัน
 
 ## C. มาตรฐานการทำงาน (กันพลาดก่อนสร้าง draft ทุกครั้ง)
 

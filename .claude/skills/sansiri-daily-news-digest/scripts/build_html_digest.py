@@ -74,12 +74,13 @@ def render_section(title, clusters):
 
 
 def web_link_row(url):
-    """Footer link to the standalone web version (clean, direct article links)."""
+    """Footer: show the FULL web-version URL as visible, clickable text."""
     if not url:
         return ""
     return f"""
-<tr><td style="padding:0 24px 20px 24px;">
-  <p style="margin:0;font-size:12px;color:#777777;font-family:{FONT};">&#128279; <a href="{esc(url)}" style="color:{LINK};text-decoration:underline;">เปิดเวอร์ชันเว็บ (คลิกลิงก์ข่าวได้โดยตรง สำหรับตรวจสอบ)</a></p>
+<tr><td style="padding:0 24px 22px 24px;">
+  <p style="margin:0 0 4px 0;font-size:12px;color:#777777;font-family:{FONT};">&#128279; เปิดเวอร์ชันเว็บ (คลิกลิงก์ข่าวได้โดยตรง สำหรับตรวจสอบ):</p>
+  <p style="margin:0;font-size:12px;line-height:1.5;word-break:break-all;font-family:{FONT};"><a href="{esc(url)}" style="color:{LINK};text-decoration:underline;">{esc(url)}</a></p>
 </td></tr>"""
 
 

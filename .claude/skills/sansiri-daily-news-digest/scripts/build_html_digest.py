@@ -73,7 +73,17 @@ def render_section(title, clusters):
 {items}"""
 
 
-def build(cfg, date_th, date_en):
+def web_link_row(url):
+    """Footer link to the standalone web version (clean, direct article links)."""
+    if not url:
+        return ""
+    return f"""
+<tr><td style="padding:0 24px 20px 24px;">
+  <p style="margin:0;font-size:12px;color:#777777;font-family:{FONT};">&#128279; <a href="{esc(url)}" style="color:{LINK};text-decoration:underline;">เปิดเวอร์ชันเว็บ (คลิกลิงก์ข่าวได้โดยตรง สำหรับตรวจสอบ)</a></p>
+</td></tr>"""
+
+
+def build(cfg, date_th, date_en, web_link=""):
     intro = (f"ข่าวเกี่ยวกับกลุ่มบริษัทแสนสิริ ข่าวคู่แข่งและอสังหาทั่วไป "
              f"&nbsp;วันที่ &nbsp;{esc(date_th)} &nbsp;&nbsp;มีรายละเอียดที่น่าสนใจดังนี้")
     return f"""<!DOCTYPE html>
@@ -100,7 +110,7 @@ def build(cfg, date_th, date_en):
 <tr><td style="padding:18px 24px;">
   <p style="margin:0;font-size:14px;color:#000000;font-family:{FONT};">{FOOTER}</p>
 </td></tr>
-
+{web_link_row(web_link)}
 </table>
 </body>
 </html>"""
@@ -112,6 +122,7 @@ def main():
     ap.add_argument("--date", required=True, help="Thai date e.g. '24 มิถุนายน 2569'")
     ap.add_argument("--date-en", required=True, help="English date e.g. 'June 24, 2026'")
     ap.add_argument("--output", required=True)
+    ap.add_argument("--web-link", default="", help="URL of the hosted standalone HTML; shown at the very bottom for review")
     ap.add_argument("--skip-validation", action="store_true")
     args = ap.parse_args()
 
@@ -125,7 +136,7 @@ def main():
                       file=sys.stderr)
                 return 2
 
-    html_out = build(cfg, args.date, args.date_en)
+    html_out = build(cfg, args.date, args.date_en, web_link=args.web_link)
     with open(args.output, "w", encoding="utf-8") as fh:
         fh.write(html_out)
     n = len(cfg.get("sansiri", [])) + len(cfg.get("competitor", []))

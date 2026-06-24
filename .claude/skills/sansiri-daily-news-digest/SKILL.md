@@ -73,6 +73,12 @@ python3 scripts/pre_draft_check.py work/digest_<YYYYMMDD>.html
 ```
 Must exit 0. If it fails, fix `digest_config.json` → rebuild → re-validate.
 
+**Step 6.5 — Host web version + link it (BR-10).** Upload `work/Sansiri-News-<YYYY-MM-DD>.html`
+to Google Drive (Drive MCP `create_file`, `contentMimeType: text/html`, `disableConversionToGoogleType: true`),
+grab its `webViewLink`, and pass it to the builder so the email shows a bottom link for review:
+`build_html_digest.py ... --web-link "<webViewLink>"` (rebuild + re-validate). Note: the Drive link is
+owner-private (MCP can't set public sharing) — fine for the reviewer; for all-recipients use public hosting.
+
 **Step 7 — Create draft (C-07).** Read the HTML file and call Gmail MCP `create_draft`
 with the recipients + subject (see below) + HTML body. **Also attach the same HTML file**
 (`attachments: [{filename: "Sansiri-News-<YYYY-MM-DD>.html", mimeType: "text/html",

@@ -18,6 +18,7 @@
 | **D-04** | สร้าง **draft ทดสอบซ้ำหลายฉบับ** รกกล่อง | รันสร้าง draft ซ้ำโดยไม่เช็กของเดิม | Idempotency pre-check ก่อนสร้าง | **FR-16 / SKILL Step 0** (`daily_meta.py` → `list_drafts`/`search_threads`; มีแล้วให้หยุด) |
 | **D-05** | แนบไฟล์ HTML เข้า draft ไม่ได้ (`Internal error`) | Gmail MCP `create_draft` **ไม่รองรับ attachments** | ทดสอบยืนยันข้อจำกัด; เตรียมไฟล์ standalone ไว้แนบผ่าน production send path (Gmail API/GAS) | **Techspec R-06** + **BR-09** (ไม่พยายามแนบผ่าน MCP; ใช้ `build_standalone.py`) |
 | **D-06** | base64 ก้อนใหญ่ทำตัวช่วยโดน policy filter/รันค้าง | ส่ง base64 ขนาดใหญ่ผ่าน model context | หลีกเลี่ยงการส่ง base64 ผ่าน MCP create_draft (เพราะแนบไม่ได้อยู่แล้ว — D-05) | เลิกใช้ attachment ผ่าน MCP (อ้างอิง D-05) |
+| **D-07** | **หน้าต่างเวลาไม่ถูกบังคับใช้** — parser เอาข่าวทุกชิ้นในอีเมล ไม่กรองตามกฎ (เมื่อวาน 07:00→วันนี้ 06:00) | เรียก `fetch_iqnewsclip.py` โดยไม่ส่ง `--start/--end` (ทั้ง test และ routine) + เอกสารเขียนกฎผิด ("D-1 12:00→run") | `daily_meta.py` คำนวณ `window_start`/`window_end` ให้, SKILL/routine ส่ง `--start/--end` ทุกครั้ง, แก้กฎในเอกสารเป็น เมื่อวาน 07:00→วันนี้ 06:00 | **FR-04** + SKILL Step 2 บังคับส่งหน้าต่างเวลา (exit 3 ถ้าไม่มีข่าวในกรอบ) |
 
 ## B. Locked design decisions (อ้างอิงคำตัดสินกับมุก)
 

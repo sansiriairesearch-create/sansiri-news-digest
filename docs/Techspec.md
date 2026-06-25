@@ -186,7 +186,7 @@ Gmail MCP จะ auto-save response ที่ใหญ่เกิน ~25k token
 | Recipients | 7 ผู้รับ (ดู [PRD.md §3](./PRD.md)) | config ไฟล์/ตัวแปร |
 | Entities | กลุ่มแสนสิริ + 15 คู่แข่ง (ดู [PRD.md BR-07](./PRD.md)) | `references/company_keywords.md` |
 | Keywords / Top Media | คีย์เวิร์ด 7 หมวด + Top Media ranked | `references/*.md` |
-| Time window | D-1 12:00 → run time (ชั่วโมงปรับได้) | config |
+| Time window | เมื่อวาน 07:00 → วันนี้ 06:00 (จาก daily_meta.py) | config |
 | Brand tokens | navy/gold/link-blue, GraphikTH | ใช้ใน C-05 (ดู [uxui.md](./uxui.md)) |
 | Secrets | **ห้ามฝังในโค้ด/สกิล** — ใช้ env / Script properties เท่านั้น (NFR-04) | runtime env |
 

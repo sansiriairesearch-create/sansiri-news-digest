@@ -136,7 +136,7 @@
       "title": "C-02 Parser — fetch_iqnewsclip.py",
       "phase": "P1",
       "status": "done",
-      "description": "แตกตาราง 7 คอลัมน์เป็น NewsItem, dedupe ข้ามอีเมล, กรองช่วงเวลา D-1 12:00 → run (Asia/Bangkok)",
+      "description": "แตกตาราง 7 คอลัมน์เป็น NewsItem, dedupe ข้ามอีเมล, กรองช่วงเวลา เมื่อวาน 07:00 → วันนี้ 06:00 (Asia/Bangkok)",
       "prdRefs": [
         "FR-02",
         "FR-03",

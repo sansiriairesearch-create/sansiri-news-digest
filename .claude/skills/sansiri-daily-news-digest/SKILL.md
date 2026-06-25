@@ -19,7 +19,7 @@ leave it as a **Gmail draft**. Design docs: `../../../docs/PRD.md`,
 ## Hard rules
 1. **DRAFT ONLY — never send.** Create a Gmail draft and stop. A human reviews and sends. (PRD Rule 35 / FR-13)
 2. **Email-only / headless.** Source = the iQNewsClip email via Gmail MCP. No NCX/Chrome/browser login.
-3. **All times Asia/Bangkok.** Window = D-1 12:00 → run time (configurable).
+3. **All times Asia/Bangkok.** Window = yesterday 07:00 → today 06:00 (Asia/Bangkok), from daily_meta.py.
 4. **Content Quality Gate** on every story (see below) — drop bad items even if it means fewer than 10.
 5. **Validator must exit 0** before creating the draft.
 6. **No secrets in files.** Recipients/config only; nothing sensitive committed.
@@ -39,10 +39,11 @@ drafts when the run fires more than once. Only continue if none exists.
 `search_threads` with `subject:"Sansiri News" from:iqnewsclip@iqnewsclip.com newer_than:2d`,
 then `get_thread` (FULL_CONTENT). Large bodies auto-save to a `tool-results/*.txt` file — note the path.
 
-**Step 2 — Parse (C-02).**
+**Step 2 — Parse (C-02).** ALWAYS pass the time window from Step 0 (`window_start`/`window_end`)
+so only news in **yesterday 07:00 → today 06:00 (Asia/Bangkok)** is kept (PRD FR-04):
 ```
 python3 scripts/fetch_iqnewsclip.py --file <tool-results .txt or thread .json> \
-        --start "<D-1 12:00>" --end "<now>" --out work/iqnewsclip_parsed.json
+        --start "<window_start>" --end "<window_end>" --out work/iqnewsclip_parsed.json
 ```
 Exit 1 = no input · 2 = parse error · 3 = empty window → on any non-zero, go to **Failure path**.
 
@@ -73,22 +74,21 @@ python3 scripts/pre_draft_check.py work/digest_<YYYYMMDD>.html
 ```
 Must exit 0. If it fails, fix `digest_config.json` → rebuild → re-validate.
 
-**Step 6.5 — Host web version + link it (BR-10).** Upload `work/Sansiri-News-<YYYY-MM-DD>.html`
-to Google Drive (Drive MCP `create_file`, `contentMimeType: text/html`, `disableConversionToGoogleType: true`),
-grab its `webViewLink`, and pass it to the builder so the email shows a bottom link for review:
-`build_html_digest.py ... --web-link "<webViewLink>"` (rebuild + re-validate). Note: the Drive link is
-owner-private (MCP can't set public sharing) — fine for the reviewer; for all-recipients use public hosting.
+**Step 6.5 — Publish web version + link it (BR-10).** Render the standalone page **into the repo** and publish it so it can be linked as a real web page:
+```
+python3 scripts/build_standalone.py --input work/digest_config.json \
+        --date "<date_th>" --date-en "<date_en>" --output web/Sansiri-News-<iso>.html
+git add web/Sansiri-News-<iso>.html && git commit -m "web: digest <iso>" && git push origin main
+```
+Web link = `https://htmlpreview.github.io/?https://raw.githubusercontent.com/sansiriairesearch-create/sansiri-news-digest/main/web/Sansiri-News-<iso>.html`.
+Then rebuild the email so the FULL URL shows at the very bottom:
+`build_html_digest.py ... --web-link "<that URL>"` → re-run validate (Step 6).
+**Not** Google Drive (Drive doesn't render HTML as a page). If `git push` fails, build **without** `--web-link`.
 
 **Step 7 — Create draft (C-07).** Read the HTML file and call Gmail MCP `create_draft`
-with the recipients + subject (see below) + HTML body. **Also attach the same HTML file**
-(`attachments: [{filename: "Sansiri-News-<YYYY-MM-DD>.html", mimeType: "text/html",
-content: <base64 of the file>}]`) so readers can open the attachment in a browser and click
-**direct** article links that bypass Gmail's `google.com/url` wrapper. Build that file with
-`build_standalone.py`. **Do not send.** Report the draft link.
-
-> ⚠️ The current Gmail MCP `create_draft` does **not** support attachments (returns
-> `Internal error`). Until a send path that supports attachments is available (Gmail API / GAS),
-> create the draft body-only; the standalone HTML is still produced for the production attach step (Techspec R-06, PRD BR-09).
+with the recipients + subject (see below) + HTML body. **Do not attach files** — `create_draft`
+does not support attachments (returns `Internal error`); the web-version link (Step 6.5) is the
+attachment alternative. **Do not send.** Report the draft link.
 
 **Failure path (C-09).** If any step fails irrecoverably:
 ```

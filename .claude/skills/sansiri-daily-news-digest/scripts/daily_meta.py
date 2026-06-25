@@ -34,12 +34,17 @@ def meta(dt):
                                   be=dt.year + 543)
     # Day-unique fragment for Gmail draft/thread search (idempotency, FR-16).
     search_subject = f"วันที่ {dt.day} {TH_MONTHS[dt.month]} {dt.year + 543}"
+    # Time window (PRD FR-04): yesterday 07:00 -> today 06:00 (Asia/Bangkok).
+    ws = (dt - timedelta(days=1)).replace(hour=7, minute=0, second=0, microsecond=0)
+    we = dt.replace(hour=6, minute=0, second=0, microsecond=0)
     return {
         "iso": dt.strftime("%Y-%m-%d"),
         "date_th": date_th,
         "date_en": date_en,
         "subject": subject,
         "search_subject": search_subject,
+        "window_start": ws.strftime("%Y-%m-%d %H:%M"),
+        "window_end": we.strftime("%Y-%m-%d %H:%M"),
     }
 
 
